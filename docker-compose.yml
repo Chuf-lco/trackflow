@@ -1,0 +1,29 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./trackflow.db
+      - LOG_LEVEL=INFO
+      - SECRET_KEY=${SECRET_KEY:-changeme_in_prod}
+    volumes:
+      - backend_data:/app/data  # Persist SQLite DB across restarts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - VITE_API_BASE_URL=/api
+
+volumes:
+  backend_data:
