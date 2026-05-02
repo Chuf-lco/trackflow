@@ -1,3 +1,4 @@
+[![TrackFlow CI](https://github.com/Chuf-lco/trackflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Chuf-lco/trackflow/actions/workflows/ci.yml)
 ╔══════════════════════════════════════════════════════════════════════════════════════╗
 ║                    KENYA LOGISTICS SHIPMENT TRACKING WORKFLOW                        ║
 ║                    (Tailored for Mombasa Port / KPA / KRA Ecosystem)                 ║
