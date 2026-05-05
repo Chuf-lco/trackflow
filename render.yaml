@@ -1,25 +1,18 @@
 services:
   - type: web
     name: trackflow-backend
-    env: docker
-    dockerfilePath: ./backend/Dockerfile
+    env: python
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"  # ← Pin to 3.12 (has pre-built pydantic-core wheels)
       - key: DATABASE_URL
         value: sqlite:///./data/trackflow.db
       - key: LOG_LEVEL
         value: INFO
-      - key: SECRET_KEY
-        generateValue: true
-    healthCheckPath: /health
     disk:
-      name: backend-data
-      mountPath: /app/data
+      name: sqlite-data
+      mountPath: /app/backend/data
       sizeGB: 1
-
-  - type: web
-    name: trackflow-frontend
-    env: docker
-    dockerfilePath: ./frontend/Dockerfile
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: /api
