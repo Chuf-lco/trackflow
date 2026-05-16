@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .routes import shipments
 from .logging_config import setup_logging
@@ -9,6 +10,13 @@ from datetime import datetime
 logger = setup_logging(settings.LOG_LEVEL)
 
 app = FastAPI(title="TrackFlow API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], #Allows ALL origins (safe for dev/demo, restrict later)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(shipments.router)
 
 @app.middleware("http")
