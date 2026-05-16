@@ -4,25 +4,36 @@ import './App.css'
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 function App() {
-  const [shipments, setShipments] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  // 1. Check what URL is being used
+  const API_URL = import.meta.env.VITE_API_BASE_URL;
+  console.log("CURRENT API URL:", API_URL);
+
+  const [shipments, setShipments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchShipments()
-  }, [])
+    fetchShipments();
+  }, []);
 
   const fetchShipments = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/v1/shipments/`)
-      if (!response.ok) throw new Error('Failed to fetch shipments')
+      // 2. Log the full URL before fetching
+      const fullUrl = `${API_URL}/api/v1/shipments/`;
+      console.log("FETCHING FROM:", fullUrl);
+
+      const response = await fetch(fullUrl);
+
+      if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+
       const data = await response.json()
-      setShipments(data)
-      setError(null)
+      setShipments(data);
+      setError(null);
     } catch (err) {
-      setError(err.message)
+      console.error("Fetch Error:", err);
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
