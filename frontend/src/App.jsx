@@ -1,121 +1,119 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useState, useEffect } from 'react'
 import './App.css'
 
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [shipments, setShipments] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    fetchShipments()
+  }, [])
+
+  const fetchShipments = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/v1/shipments/`)
+      if (!response.ok) throw new Error('Failed to fetch shipments')
+      const data = await response.json()
+      setShipments(data)
+      setError(null)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getStatusColor = (status) => {
+    const colors = {
+      vessel_arrival: 'bg-blue-500',
+      customs_declaration: 'bg-yellow-500',
+      physical_verification: 'bg-orange-500',
+      inland_transit: 'bg-purple-500',
+      delivered: 'bg-green-500'
+    }
+    return colors[status] || 'bg-gray-500'
+  }
+
+  const getStatusLabel = (status) => {
+    const labels = {
+      vessel_arrival: '🚢 Vessel Arrival',
+      customs_declaration: '📋 Customs Declaration',
+      physical_verification: '🔍 Physical Verification',
+      inland_transit: '🚛 Inland Transit',
+      delivered: '✅ Delivered'
+    }
+    return labels[status] || status
+  }
+
+  if (loading) return <div className="loading">Loading TrackFlow...</div>
+  if (error) return <div className="error">Error: {error}</div>
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="App">
+      <header className="header">
+        <h1>🇰 TrackFlow - Kenya Logistics</h1>
+        <p>Mombasa Port Shipment Tracking System</p>
+      </header>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      <main className="main">
+        <div className="stats">
+          <div className="stat-card">
+            <h3>Total Shipments</h3>
+            <p className="stat-number">{shipments.length}</p>
+          </div>
+          <div className="stat-card">
+            <h3>In Transit</h3>
+            <p className="stat-number">
+              {shipments.filter(s => s.current_status !== 'delivered').length}
+            </p>
+          </div>
+          <div className="stat-card">
+            <h3>Delivered</h3>
+            <p className="stat-number">
+              {shipments.filter(s => s.current_status === 'delivered').length}
+            </p>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        <div className="shipments-list">
+          <h2>Active Shipments</h2>
+          {shipments.length === 0 ? (
+            <p className="empty-state">No shipments found. Create one via the API!</p>
+          ) : (
+            shipments.map((shipment) => (
+              <div key={shipment.id} className="shipment-card">
+                <div className="shipment-header">
+                  <h3>{shipment.bl_number}</h3>
+                  <span className={`status-badge ${getStatusColor(shipment.current_status)}`}>
+                    {getStatusLabel(shipment.current_status)}
+                  </span>
+                </div>
+                <div className="shipment-details">
+                  <p><strong>Container:</strong> {shipment.container_number}</p>
+                  <p><strong>ID:</strong> {shipment.id}</p>
+                  <p><strong>Payment:</strong> {shipment.payment_status}</p>
+                  {shipment.demurrage_days > 0 && (
+                    <p className="demurrage-warning">
+                      ⚠️ Demurrage: {shipment.demurrage_days} days
+                    </p>
+                  )}
+                </div>
+                <div className="shipment-footer">
+                  <small>
+                    Updated: {new Date(shipment.updated_at).toLocaleString('en-KE', {
+                      timeZone: 'Africa/Nairobi'
+                    })}
+                  </small>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </main>
+    </div>
   )
 }
 
