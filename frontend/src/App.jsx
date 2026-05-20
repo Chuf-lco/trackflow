@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import StatusTransitionModal from './components/StatusTransitionModal';
+import DemurrageWidget from './components/DemurrageWidget';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -123,6 +124,7 @@ function App() {
 
                 {/* ✅ Update Status Button */}
                 <div className="shipment-actions">
+                  <DemurrageWidget customsDate={shipment.customs_declaration_date} />
                   <button
                     className="btn-primary"
                     onClick={() => setTransitioningShipment(shipment)}
