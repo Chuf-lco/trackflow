@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import StatusTransitionModal from './components/StatusTransitionModal';
 import DemurrageWidget from './components/DemurrageWidget';
+import CreateShipmentForm from './components/CreateShipmentForm';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -10,7 +11,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [transitioningShipment, setTransitioningShipment] = useState(null);
-
+  const [creatingShipment, setCreatingShipment] = useState(false);
   useEffect(() => {
     fetchShipments();
   }, []);
@@ -87,6 +88,24 @@ function App() {
         </div>
 
         <div className="shipments-list">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+    <h2 style={{ margin: 0 }}>Active Shipments</h2>
+    <button
+      onClick={() => setCreatingShipment(true)}
+      style={{
+        padding: '10px 20px',
+        background: '#22c55e',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        fontWeight: '600',
+        fontSize: '14px'
+      }}
+    >
+      ➕ Create Shipment
+    </button>
+  </div>
           <h2>Active Shipments</h2>
           {shipments.length === 0 ? (
             <p className="empty-state">No shipments found. Create one via the API!</p>
@@ -156,6 +175,13 @@ function App() {
           shipment={transitioningShipment}
           onClose={() => setTransitioningShipment(null)}
           onSuccess={handleStatusUpdated}
+        />
+      )}
+      {/* ✅ Create Shipment Modal */}
+      {creatingShipment && (
+        <CreateShipmentForm
+          onClose={() => setCreatingShipment(false)}
+          onSuccess={handleShipmentCreated}
         />
       )}
     </div>
