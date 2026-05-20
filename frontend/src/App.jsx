@@ -1,14 +1,10 @@
-import { useState, useEffect } from 'react'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
 import StatusTransitionModal from './components/StatusTransitionModal';
 
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 function App() {
-  // 1. Check what URL is being used
-  const API_URL = import.meta.env.VITE_API_BASE_URL;
-  console.log("CURRENT API URL:", API_URL);
-
   const [shipments, setShipments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,35 +16,33 @@ function App() {
 
   const fetchShipments = async () => {
     try {
-      // 2. Log the full URL before fetching
-      const fullUrl = `${API_URL}/api/v1/shipments/`;
-      console.log("FETCHING FROM:", fullUrl);
-
-      const response = await fetch(fullUrl);
-
-      if (!response.ok) throw new Error(`Server responded with ${response.status}`);
-
-      const data = await response.json()
+      const response = await fetch(`${API_URL}/api/v1/shipments/`);
+      if (!response.ok) throw new Error('Failed to fetch shipments');
+      const data = await response.json();
       setShipments(data);
       setError(null);
     } catch (err) {
-      console.error("Fetch Error:", err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      vessel_arrival: 'bg-blue-500',
-      customs_declaration: 'bg-yellow-500',
-      physical_verification: 'bg-orange-500',
-      inland_transit: 'bg-purple-500',
-      delivered: 'bg-green-500'
-    }
-    return colors[status] || 'bg-gray-500'
-  }
+  const handleStatusUpdated = () => {
+    fetchShipments();
+  };
+
+  // Status badge styles (inline for reliability across environments)
+  const getStatusStyle = (status) => {
+    const styles = {
+      vessel_arrival: { background: '#3b82f6', color: '#fff' },
+      customs_declaration: { background: '#eab308', color: '#000' },
+      physical_verification: { background: '#f97316', color: '#fff' },
+      inland_transit: { background: '#a855f7', color: '#fff' },
+      delivered: { background: '#22c55e', color: '#fff' }
+    };
+    return styles[status] || { background: '#6b7280', color: '#fff' };
+  };
 
   const getStatusLabel = (status) => {
     const labels = {
@@ -57,17 +51,17 @@ function App() {
       physical_verification: '🔍 Physical Verification',
       inland_transit: '🚛 Inland Transit',
       delivered: '✅ Delivered'
-    }
-    return labels[status] || status
-  }
+    };
+    return labels[status] || status;
+  };
 
-  if (loading) return <div className="loading">Loading TrackFlow...</div>
-  if (error) return <div className="error">Error: {error}</div>
+  if (loading) return <div className="loading">Loading TrackFlow...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="App">
       <header className="header">
-        <h1>🇰 TrackFlow - Kenya Logistics</h1>
+        <h1> TrackFlow - Kenya Logistics</h1>
         <p>Mombasa Port Shipment Tracking System</p>
       </header>
 
@@ -100,10 +94,14 @@ function App() {
               <div key={shipment.id} className="shipment-card">
                 <div className="shipment-header">
                   <h3>{shipment.bl_number}</h3>
-                  <span className={`status-badge ${getStatusColor(shipment.current_status)}`}>
+                  <span 
+                    className="status-badge" 
+                    style={getStatusStyle(shipment.current_status)}
+                  >
                     {getStatusLabel(shipment.current_status)}
                   </span>
                 </div>
+                
                 <div className="shipment-details">
                   <p><strong>Container:</strong> {shipment.container_number}</p>
                   <p><strong>ID:</strong> {shipment.id}</p>
@@ -114,14 +112,6 @@ function App() {
                     </p>
                   )}
                 </div>
-                <div className="shipment-actions">
-                <button 
-                  className="btn-primary"
-                  onClick={() => setTransitioningShipment(shipment)}
-                >
-                  Update Status
-                </button>
-              </div>
 
                 <div className="shipment-footer">
                   <small>
@@ -130,11 +120,35 @@ function App() {
                     })}
                   </small>
                 </div>
+
+                {/* ✅ Update Status Button */}
+                <div className="shipment-actions">
+                  <button
+                    className="btn-primary"
+                    onClick={() => setTransitioningShipment(shipment)}
+                    style={{
+                      marginTop: '12px',
+                      width: '100%',
+                      padding: '10px',
+                      background: '#667eea',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '5px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      fontSize: '14px'
+                    }}
+                  >
+                    🚚 Update Status
+                  </button>
+                </div>
               </div>
             ))
           )}
         </div>
       </main>
+
+      {/* ✅ Status Transition Modal */}
       {transitioningShipment && (
         <StatusTransitionModal
           shipment={transitioningShipment}
@@ -143,7 +157,7 @@ function App() {
         />
       )}
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
