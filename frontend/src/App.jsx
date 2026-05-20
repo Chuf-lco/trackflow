@@ -112,6 +112,15 @@ function App() {
                     </p>
                   )}
                 </div>
+                <div className="shipment-actions">
+                <button 
+                  className="btn-primary"
+                  onClick={() => setTransitioningShipment(shipment)}
+                >
+                  Update Status
+                </button>
+              </div>
+
                 <div className="shipment-footer">
                   <small>
                     Updated: {new Date(shipment.updated_at).toLocaleString('en-KE', {
@@ -124,6 +133,13 @@ function App() {
           )}
         </div>
       </main>
+      {transitioningShipment && (
+        <StatusTransitionModal
+          shipment={transitioningShipment}
+          onClose={() => setTransitioningShipment(null)}
+          onSuccess={handleStatusUpdated}
+        />
+      )}
     </div>
   )
 }
