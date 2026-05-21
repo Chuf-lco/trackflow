@@ -1,11 +1,7 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
 export default defineConfig({
-  // ... other config
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://trackflow-backend-2mxx.onrender.com',
-        changeOrigin: true,
-      }
-    }
-  }
+  plugins: [react()],
 })
