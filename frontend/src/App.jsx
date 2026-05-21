@@ -181,7 +181,10 @@ function App() {
       {creatingShipment && (
         <CreateShipmentForm
           onClose={() => setCreatingShipment(false)}
-          onSuccess={handleShipmentCreated}
+          onSuccess={() => {
+            setCreatingShipment(false);
+            fetchShipments(); //Reuse existing function
+          }}
         />
       )}
     </div>
