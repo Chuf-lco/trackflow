@@ -3,6 +3,7 @@ import './App.css';
 import StatusTransitionModal from './components/StatusTransitionModal';
 import DemurrageWidget from './components/DemurrageWidget';
 import CreateShipmentForm from './components/CreateShipmentForm';
+import TimelineWidget from './components/TimelineWidget';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -122,6 +123,11 @@ function App() {
                   </span>
                 </div>
                 
+                {/* ✅ INSERT TIMELINE WIDGET HERE */}
+  <TimelineWidget 
+    currentStatus={shipment.current_status} 
+    history={shipment.status_history} 
+  />
                 <div className="shipment-details">
                   <p><strong>Container:</strong> {shipment.container_number}</p>
                   <p><strong>ID:</strong> {shipment.id}</p>
