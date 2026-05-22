@@ -141,6 +141,8 @@ function App() {
                     </p>
                   )}
                 </div>
+                {/* ✅ CORRECT: Inside the map loop */}
+                <WhatsAppAlert shipment={shipment} />
 
                 <div className="shipment-footer">
                   <small>
@@ -249,8 +251,6 @@ function App() {
         onSuccess={handleStatusUpdated}
         />
         )}
-        {/* ✅ WhatsApp Alerts */}
-        <WhatsAppAlert shipment={shipment} />
     </div>
   );
 }
