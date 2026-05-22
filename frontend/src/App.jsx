@@ -195,7 +195,7 @@ function App() {
                       🇰 Pay via M-Pesa (Clear Customs)
                     </button>
                       )}
-                      
+
                   <button
                     className="btn-primary"
                     onClick={() => setTransitioningShipment(shipment)}
@@ -240,6 +240,14 @@ function App() {
           }}
         />
       )}
+      {/* ✅ Modal */}
+      {payingShipment && (
+        <MpesaPaymentModal
+        shipment={payingShipment}
+        onClose={() => setPayingShipment(null)}
+        onSuccess={handleStatusUpdated}
+        />
+        )}
     </div>
   );
 }
