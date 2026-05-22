@@ -4,6 +4,7 @@ import StatusTransitionModal from './components/StatusTransitionModal';
 import DemurrageWidget from './components/DemurrageWidget';
 import CreateShipmentForm from './components/CreateShipmentForm';
 import TimelineWidget from './components/TimelineWidget';
+import MpesaPaymentModal from './components/MpesaPaymentModal';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -13,6 +14,7 @@ function App() {
   const [error, setError] = useState(null);
   const [transitioningShipment, setTransitioningShipment] = useState(null);
   const [creatingShipment, setCreatingShipment] = useState(false);
+  const [payingShipment, setPayingShipment] = useState(null);
   useEffect(() => {
     fetchShipments();
   }, []);
@@ -180,6 +182,20 @@ function App() {
                     >
                       🖨️ Print / Export PDF (KRA Audit)
                   </button>
+                  {/* ✅ M-Pesa Button */}
+                  {shipment.payment_status === 'pending' && (
+                    <button 
+                    onClick={() => setPayingShipment(shipment)}
+                    style={{
+                      width: '100%', padding: '10px', background: '#4CAF50', color: 'white',
+                      border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold',
+                      marginBottom: '10px', fontSize: '14px'
+                      }}
+                    >
+                      🇰 Pay via M-Pesa (Clear Customs)
+                    </button>
+                      )}
+                      
                   <button
                     className="btn-primary"
                     onClick={() => setTransitioningShipment(shipment)}

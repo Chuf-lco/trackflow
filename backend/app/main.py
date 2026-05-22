@@ -5,6 +5,7 @@ from .routes import shipments
 from .logging_config import setup_logging
 import logging
 from datetime import datetime
+from .routes import shipments, mpesa
 
 # Setup logging
 logger = setup_logging(settings.LOG_LEVEL)
@@ -18,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(shipments.router)
+app.include_router(mpesa.router)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
