@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, logger
 from ..models import Shipment, ShipmentStatus, StatusTransition
 from datetime import datetime, timezone
+from ..services.notifications import notification_service
 import time
 import random
 
@@ -36,6 +37,26 @@ def simulate_mpesa_payment(shipment_id: str, payload: dict):
     # 5. Update Shipment Status to Customs Declaration (Green Channel)
     # This matches your README: "Payment Received -> KRA Risk Assessment"
     now_eat = datetime.now(timezone.utc) # Using UTC for storage
+
+    # 6. Send WhatsApp Notification
+    try:
+        # In production, get phone from shipment.owner_phone
+        # For demo, use hardcoded number
+        phone = "712345678"  
+        message = notification_service.get_status_message(shipment)
+        notification_service.send_whatsapp_alert(phone, message)
+        
+        logger.info(f"✅ WhatsApp sent to {phone}")
+    except Exception as e:
+        logger.error(f"Failed to send WhatsApp: {e}")
+        # Don't fail the payment if notification fails
+
+    return {
+        "status": "success",
+        "message": "Payment Received. Shipment moved to Customs Declaration.",
+        "mpesa_receipt": f"MBA{random.randint(1000, 9999)}",
+        "notification_sent": True
+    }
     
     transition = StatusTransition(
         timestamp=now_eat,

@@ -5,6 +5,7 @@ import DemurrageWidget from './components/DemurrageWidget';
 import CreateShipmentForm from './components/CreateShipmentForm';
 import TimelineWidget from './components/TimelineWidget';
 import MpesaPaymentModal from './components/MpesaPaymentModal';
+import WhatsAppAlert from './components/WhatsAppAlert';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -248,6 +249,8 @@ function App() {
         onSuccess={handleStatusUpdated}
         />
         )}
+        {/* ✅ WhatsApp Alerts */}
+        <WhatsAppAlert shipment={shipment} />
     </div>
   );
 }
