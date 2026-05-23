@@ -104,12 +104,7 @@ function App() {
         <h1>🇰🇪 {t.title}</h1> 
         <p>{t.subtitle}</p>
       </header>
-      <header className="header">
-        <h1> TrackFlow - Kenya Logistics</h1>
-        <p>Mombasa Port Shipment Tracking System</p>
-      </header>
       
-
       <main className="main">
         <div className="stats">
           <div className="stat-card">
