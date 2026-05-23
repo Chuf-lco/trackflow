@@ -108,17 +108,17 @@ function App() {
       <main className="main">
         <div className="stats">
           <div className="stat-card">
-            <h3>Total Shipments</h3>
+            <h3>{t.totalShipments}</h3>
             <p className="stat-number">{shipments.length}</p>
           </div>
           <div className="stat-card">
-            <h3>In Transit</h3>
+            <h3>{t.inTransit}</h3>
             <p className="stat-number">
               {shipments.filter(s => s.current_status !== 'delivered').length}
             </p>
           </div>
           <div className="stat-card">
-            <h3>Delivered</h3>
+            <h3>{t.delivered}</h3>
             <p className="stat-number">
               {shipments.filter(s => s.current_status === 'delivered').length}
             </p>
@@ -141,7 +141,7 @@ function App() {
         fontSize: '14px'
       }}
     >
-      ➕ Create Shipment
+      ➕ {t.createShipment}
     </button>
   </div>
           <h2>Active Shipments</h2>
