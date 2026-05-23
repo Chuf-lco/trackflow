@@ -127,7 +127,7 @@ function App() {
 
         <div className="shipments-list">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-    <h2 style={{ margin: 0 }}>Active Shipments</h2>
+    <h2 style={{ margin: 0 }}>{t.activeShipments}</h2>
     <button
       onClick={() => setCreatingShipment(true)}
       style={{
@@ -141,10 +141,10 @@ function App() {
         fontSize: '14px'
       }}
     >
-      ➕ {t.createShipment}
+       {t.createShipment}
     </button>
   </div>
-          <h2>Active Shipments</h2>
+          <h2>{t.activeShipments}</h2>
           {shipments.length === 0 ? (
             <p className="empty-state">No shipments found. Create one via the API!</p>
           ) : (
