@@ -6,6 +6,7 @@ import CreateShipmentForm from './components/CreateShipmentForm';
 import TimelineWidget from './components/TimelineWidget';
 import MpesaPaymentModal from './components/MpesaPaymentModal';
 import WhatsAppAlert from './components/WhatsAppAlert';
+import GPSTrackingMap from './components/GPSTrackingMap';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -126,7 +127,7 @@ function App() {
                   </span>
                 </div>
                 
-                {/* ✅ INSERT TIMELINE WIDGET HERE */}
+                {/* TIMELINE WIDGET */}
                 <TimelineWidget 
                 currentStatus={shipment.current_status} 
                 history={shipment.status_history} 
@@ -141,7 +142,10 @@ function App() {
                     </p>
                   )}
                 </div>
-                {/* ✅ CORRECT: Inside the map loop */}
+                {/* MAP WIDGET */}
+                <GPSTrackingMap currentStatus={shipment.current_status} />
+
+                {/* Inside the map loop */}
                 <WhatsAppAlert shipment={shipment} />
 
                 <div className="shipment-footer">
@@ -164,10 +168,10 @@ function App() {
                   <p><strong>Audit Reference:</strong> {shipment.id}-AUDIT-{new Date().getFullYear()}</p>
                   </div>
 
-                {/* ✅ Update Status Button */}
+                {/*  Update Status Button */}
                 <div className="shipment-actions">
                   <DemurrageWidget customsDate={shipment.customs_declaration_date} />
-                  {/* ✅ Print Button for KRA Audit */}
+                  {/*  Print Button for KRA Audit */}
                   <button 
                   onClick={() => window.print()}
                   style={{
@@ -185,7 +189,7 @@ function App() {
                     >
                       🖨️ Print / Export PDF (KRA Audit)
                   </button>
-                  {/* ✅ M-Pesa Button */}
+                  {/*  M-Pesa Button */}
                   {shipment.payment_status === 'pending' && (
                     <button 
                     onClick={() => setPayingShipment(shipment)}
@@ -225,7 +229,7 @@ function App() {
         </div>
       </main>
 
-      {/* ✅ Status Transition Modal */}
+      {/*  Status Transition Modal */}
       {transitioningShipment && (
         <StatusTransitionModal
           shipment={transitioningShipment}
@@ -233,7 +237,7 @@ function App() {
           onSuccess={handleStatusUpdated}
         />
       )}
-      {/* ✅ Create Shipment Modal */}
+      {/*  Create Shipment Modal */}
       {creatingShipment && (
         <CreateShipmentForm
           onClose={() => setCreatingShipment(false)}
@@ -243,7 +247,7 @@ function App() {
           }}
         />
       )}
-      {/* ✅ Modal */}
+      {/*  M-Pesa Payment Modal */}
       {payingShipment && (
         <MpesaPaymentModal
         shipment={payingShipment}
