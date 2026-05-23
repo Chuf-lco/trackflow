@@ -7,6 +7,7 @@ import TimelineWidget from './components/TimelineWidget';
 import MpesaPaymentModal from './components/MpesaPaymentModal';
 import WhatsAppAlert from './components/WhatsAppAlert';
 import GPSTrackingMap from './components/GPSTrackingMap';
+import { translations } from './translations';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
@@ -17,6 +18,8 @@ function App() {
   const [transitioningShipment, setTransitioningShipment] = useState(null);
   const [creatingShipment, setCreatingShipment] = useState(false);
   const [payingShipment, setPayingShipment] = useState(null);
+  const [lang, setLang] = useState('en'); // 'en' or 'sw'
+  const t = translations[lang]; // Simple translation function
   useEffect(() => {
     fetchShipments();
   }, []);
@@ -67,10 +70,45 @@ function App() {
 
   return (
     <div className="App">
+      {/* Language Toggle (Top Right) */}
+      <div style={{ 
+        position: 'absolute', top: '10px', right: '10px', 
+        display: 'flex', gap: '10px' 
+      }}>
+        <button 
+          onClick={() => setLang('en')}
+          style={{ 
+            padding: '5px 10px', 
+            background: lang === 'en' ? '#667eea' : '#ccc',
+            color: lang === 'en' ? 'white' : 'black',
+            border: 'none', borderRadius: '5px', cursor: 'pointer'
+          }}
+        >
+          🇬🇧 English
+        </button>
+        <button 
+          onClick={() => setLang('sw')}
+          style={{ 
+            padding: '5px 10px', 
+            background: lang === 'sw' ? '#667eea' : '#ccc',
+            color: lang === 'sw' ? 'white' : 'black',
+            border: 'none', borderRadius: '5px', cursor: 'pointer'
+          }}
+        >
+          🇰🇪 Kiswahili
+        </button>
+      </div>
+
+      <header className="header">
+        {/* Use translation keys */}
+        <h1>🇰🇪 {t.title}</h1> 
+        <p>{t.subtitle}</p>
+      </header>
       <header className="header">
         <h1> TrackFlow - Kenya Logistics</h1>
         <p>Mombasa Port Shipment Tracking System</p>
       </header>
+      
 
       <main className="main">
         <div className="stats">
@@ -119,13 +157,11 @@ function App() {
               <div key={shipment.id} className="shipment-card">
                 <div className="shipment-header">
                   <h3>{shipment.bl_number}</h3>
-                  <span 
-                    className="status-badge" 
-                    style={getStatusStyle(shipment.current_status)}
-                  >
-                    {getStatusLabel(shipment.current_status)}
+                  <span className={`status-badge ${getStatusStyle(shipment.current_status)}`}>
+                    {t[shipment.current_status]} {/* Uses translated status */}
                   </span>
-                </div>
+
+                  
                 
                 {/* TIMELINE WIDGET */}
                 <TimelineWidget 
@@ -135,7 +171,8 @@ function App() {
                 <div className="shipment-details">
                   <p><strong>Container:</strong> {shipment.container_number}</p>
                   <p><strong>ID:</strong> {shipment.id}</p>
-                  <p><strong>Payment:</strong> {shipment.payment_status}</p>
+                  <p><strong>{t.payment}:</strong> {shipment.payment_status === 'pending' ? t.pending : t.paid}</p>
+                </div>
                   {shipment.demurrage_days > 0 && (
                     <p className="demurrage-warning">
                       ⚠️ Demurrage: {shipment.demurrage_days} days
@@ -193,13 +230,14 @@ function App() {
                   {shipment.payment_status === 'pending' && (
                     <button 
                     onClick={() => setPayingShipment(shipment)}
+
                     style={{
                       width: '100%', padding: '10px', background: '#4CAF50', color: 'white',
                       border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold',
                       marginBottom: '10px', fontSize: '14px'
                       }}
                     >
-                      🇰 Pay via M-Pesa (Clear Customs)
+                      🇰 {t.payViaMpesa}
                     </button>
                       )}
 
@@ -219,7 +257,7 @@ function App() {
                       fontSize: '14px'
                     }}
                   >
-                    🚚 Update Status
+                    🚚 {t.updateStatus}
                   </button>
 
                 </div>
