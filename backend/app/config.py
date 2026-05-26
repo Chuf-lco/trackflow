@@ -2,14 +2,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 import os
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite:///./data/trackflow.db"  # Note: /data/ for Docker volume
+    DATABASE_URL: str 
     LOG_LEVEL: str = "INFO"
-    SECRET_KEY: str = "changeme_in_prod"
-    
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore"
-    )
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str = "HS256"
+
+    class Config:
+        env_file = ".env"
 
 settings = Settings()

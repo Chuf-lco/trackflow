@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
-from .routes import shipments
+from .routes import shipments, auth
+from .database import engine, Base
 from .logging_config import setup_logging
 import logging
 from datetime import datetime
@@ -10,7 +11,11 @@ from .routes import shipments, mpesa
 # Setup logging
 logger = setup_logging(settings.LOG_LEVEL)
 
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
 app = FastAPI(title="TrackFlow API")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], #Allows ALL origins (safe for dev/demo, restrict later)
@@ -18,6 +23,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+#Register routes
+app.include_router(auth.router)
 app.include_router(shipments.router)
 app.include_router(mpesa.router)
 
