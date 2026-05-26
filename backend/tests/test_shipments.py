@@ -1,23 +1,29 @@
+import pytest
+from datetime import datetime, timedelta, timezone
 from fastapi.testclient import TestClient
+from app.main import app
 
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))  # Adjust path to import app modules
-from app.main import app
 from app.models import Shipment, ShipmentStatus
-from datetime import datetime
-import pytest
 
 client = TestClient(app)
 
 @pytest.fixture
 def sample_shipment():
+    """Complete shipment payload matching Pydantic ShipmentCreate model"""
     return {
         "id": "TEST001",
         "bl_number": "MAEU123456789",
         "container_number": "MSKU1234567",
         "current_status": "vessel_arrival",
-        "status_history": []
+        #  REQUIRED: manifest_date must be timezone-aware ISO string
+        "manifest_date": datetime.now(timezone.utc).isoformat(),
+        "payment_status": "pending",
+        "gps_tracking_active": False,
+        "demurrage_days": 0
+        # customs_declaration_date is optional - only add when testing demurrage
     }
 
 def test_create_shipment(sample_shipment):
@@ -39,7 +45,7 @@ def test_update_status(sample_shipment):
         "actor": "agent_kra_pin_A123456789",
         "source_system": "Tradex",
         "geo_location": "-4.0435, 39.6682",  # Mombasa Port
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
     
     response = client.post("/api/v1/shipments/TEST001/status", json=transition)
@@ -50,18 +56,30 @@ def test_update_status(sample_shipment):
 
 def test_demurrage_calculation(sample_shipment):
     """Test Kenya-specific demurrage calculation"""
-    # Create shipment with customs declaration 10 days ago
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta, timezone
     
-    sample_shipment["customs_declaration_date"] = (datetime.utcnow() - timedelta(days=10)).isoformat()
-    client.post("/api/v1/shipments/", json=sample_shipment)
+    # Create shipment with customs declaration 10 days ago (timezone-aware)
+    sample_shipment["customs_declaration_date"] = (
+        datetime.now(timezone.utc) - timedelta(days=10)
+    ).isoformat()
     
+    # Create the shipment first
+    create_response = client.post("/api/v1/shipments/", json=sample_shipment)
+    
+    # Debug: Print response if creation fails
+    if create_response.status_code != 200:
+        print(f"❌ Creation failed: {create_response.status_code} - {create_response.json()}")
+    
+    assert create_response.status_code == 200, f"Failed to create: {create_response.json()}"
+    
+    # Now test demurrage
     response = client.get("/api/v1/shipments/TEST001/demurrage")
     assert response.status_code == 200
+    
     data = response.json()
     assert data["demurrage_days"] >= 10
-    assert data["alert"] == True  # Over 7 days
     assert data["estimated_cost_kes"] > 0
+    assert data["alert"] == True
 
 def test_offline_sync_field(sample_shipment):
     """Test offline-synced capability (Kenya connectivity)"""

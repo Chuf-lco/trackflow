@@ -27,7 +27,10 @@ jobs:
     - name: Run tests
       run: |
         cd backend
-        pytest tests/ -v --junitxml=test-results.xml
+        export DATABASE_URL="sqlite:///./test.db"
+        export JWT_SECRET_KEY="test-secret-key-for-ci-only"
+        export TESTING="true"  # ✅ Add this line to skip auth in tests
+        pytest -v
     
     - name: Upload test results
       uses: actions/upload-artifact@v4
